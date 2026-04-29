@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title }} — OptiX POS</title>
+    <title>{{ $title }} - OptiX POS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
@@ -22,7 +22,7 @@
             </svg>
         </button>
         <a href="{{ route('dashboard') }}" class="flex items-center font-body font-semibold text-xl text-[#1A202C]">
-            <span>Opti</span><span class="text-[#004080] font-bold">X</span>
+                <img src="{{ asset('assets/img/pageImg/563436753467.png') }}" alt="OptiX" class="h-16 object-contain">
         </a>
     </div>
 
