@@ -1,6 +1,6 @@
 @props(['title' => '', 'breadcrumbs' => []])
 
-<div class="px-6 py-5 flex items-center justify-between border-b border-[#E2E8F0] bg-white">
+<div class="px-4 sm:px-6 py-4 flex flex-wrap items-center gap-3 justify-between border-b border-[#E2E8F0] bg-white">
     <div>
         <h1 class="page-title">{{ $title }}</h1>
         @if(count($breadcrumbs) > 0)

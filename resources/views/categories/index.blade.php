@@ -36,37 +36,39 @@
                         </form>
                     </td>
                 </tr>
-
-                {{-- Inline edit modal per row --}}
-                <div x-data x-on:open-modal.window="$event.detail === 'category-edit-{{ $cat->id }}' && ($el.querySelector('dialog').showModal())"
-                     x-on:close-modal.window="$el.querySelector('dialog').close()">
-                    <dialog class="modal-box rounded-xl p-0 w-full max-w-md backdrop:bg-black/40">
-                        <form method="POST" action="{{ route('categories.update', $cat) }}" class="p-6">
-                            @csrf @method('PUT')
-                            <h3 class="font-semibold font-heading text-[#1A202C] mb-4">Edit Category</h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="form-label">Name *</label>
-                                    <input type="text" name="name" value="{{ $cat->name }}" class="form-input" required>
-                                </div>
-                                <div>
-                                    <label class="form-label">Description</label>
-                                    <textarea name="description" rows="2" class="form-textarea">{{ $cat->description }}</textarea>
-                                </div>
-                            </div>
-                            <div class="flex gap-3 mt-5">
-                                <button type="submit" class="btn btn-primary">Save</button>
-                                <button type="button" @click="$el.closest('dialog').close()" class="btn btn-secondary">Cancel</button>
-                            </div>
-                        </form>
-                    </dialog>
-                </div>
                 @endforeach
                 </tbody>
             </table>
             @endif
         </x-card>
     </div>
+
+    {{-- Edit modals (placed outside the table to ensure valid HTML and correct centering) --}}
+    @foreach($categories as $cat)
+    <div x-data x-on:open-modal.window="$event.detail === 'category-edit-{{ $cat->id }}' && ($el.querySelector('dialog').showModal())"
+         x-on:close-modal.window="$el.querySelector('dialog').close()">
+        <dialog class="modal-box rounded-xl p-0 w-full max-w-md backdrop:bg-black/40">
+            <form method="POST" action="{{ route('categories.update', $cat) }}" class="p-6">
+                @csrf @method('PUT')
+                <h3 class="font-semibold font-heading text-[#1A202C] mb-4">Edit Category</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="form-label">Name *</label>
+                        <input type="text" name="name" value="{{ $cat->name }}" class="form-input" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Description</label>
+                        <textarea name="description" rows="2" class="form-textarea">{{ $cat->description }}</textarea>
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-5">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" @click="$el.closest('dialog').close()" class="btn btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </dialog>
+    </div>
+    @endforeach
 
     {{-- Create modal --}}
     <div x-data x-on:open-modal.window="$event.detail === 'category-create' && ($el.querySelector('dialog').showModal())"

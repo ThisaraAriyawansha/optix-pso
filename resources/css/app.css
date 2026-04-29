@@ -40,6 +40,36 @@ h1, h2, h3, h4, h5, h6,
     font-family: var(--font-heading);
 }
 
+/* Sidebar responsive layout */
+.sidebar-expanded {
+    width: 14rem; /* 224px - matches ml-56 */
+    transform: translateX(0);
+}
+.sidebar-collapsed {
+    width: 4rem; /* 64px - matches ml-16 */
+    transform: translateX(0);
+}
+
+/* Main content responsive margin */
+.main-sidebar-expanded { margin-left: 14rem; }
+.main-sidebar-collapsed { margin-left: 4rem; }
+
+/* Mobile overrides: sidebar becomes a slide-in drawer, no content margin shift */
+@media (max-width: 1023px) {
+    .sidebar-expanded {
+        width: 16rem;
+        transform: translateX(0);
+    }
+    .sidebar-collapsed {
+        width: 16rem;
+        transform: translateX(-100%);
+    }
+    .main-sidebar-expanded,
+    .main-sidebar-collapsed {
+        margin-left: 0;
+    }
+}
+
 /* Sidebar */
 .sidebar-item {
     display: flex;
@@ -230,6 +260,22 @@ h1, h2, h3, h4, h5, h6,
     max-width: 560px;
     max-height: 90vh;
     overflow-y: auto;
+}
+
+/* Ensure native <dialog> elements are always centered */
+dialog.modal-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+}
+
+/* Mobile-responsive tables */
+@media (max-width: 1023px) {
+    .card.overflow-hidden {
+        overflow-x: auto;
+    }
 }
 
 /* Slide-over */

@@ -11,7 +11,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body class="bg-[#F5F7FA] font-body" x-data="{ sidebarOpen: true }">
+<body class="bg-[#F5F7FA] font-body" x-data="{ sidebarOpen: window.innerWidth >= 1024 }">
 
 {{-- TOP NAVBAR --}}
 <header class="fixed top-0 left-0 right-0 h-14 bg-white border-b border-[#E2E8F0] z-30 flex items-center px-4 gap-4">
@@ -68,8 +68,19 @@
     </div>
 </header>
 
+{{-- Mobile sidebar backdrop --}}
+<div x-show="sidebarOpen" @click="sidebarOpen = false"
+     class="lg:hidden fixed inset-0 bg-black/40 z-[15]"
+     x-transition:enter="transition ease-out duration-200"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-150"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     style="display: none;"></div>
+
 {{-- SIDEBAR --}}
-<aside :class="sidebarOpen ? 'w-56' : 'w-16'"
+<aside :class="sidebarOpen ? 'sidebar-expanded' : 'sidebar-collapsed'"
        class="fixed left-0 top-14 bottom-10 bg-white border-r border-[#E2E8F0] z-20 overflow-y-auto overflow-x-hidden transition-all duration-200">
     @php
         $perms = \App\Models\RolePermission::forRole(auth()->user()->role);
@@ -167,7 +178,7 @@
 </aside>
 
 {{-- MAIN CONTENT --}}
-<main :class="sidebarOpen ? 'ml-56' : 'ml-16'" class="pt-14 pb-10 transition-all duration-200 min-h-screen">
+<main :class="sidebarOpen ? 'main-sidebar-expanded' : 'main-sidebar-collapsed'" class="pt-14 pb-10 transition-all duration-200 min-h-screen">
     @if(session('success'))
         <div class="mx-6 mt-4">
             <x-alert type="success" :message="session('success')"/>
@@ -182,16 +193,16 @@
 </main>
 
 {{-- BOTTOM APP BAR --}}
-<footer class="fixed bottom-0 left-0 right-0 h-10 bg-[#004080] text-white flex items-center px-4 gap-3 z-30 text-xs">
-    <div class="flex items-center gap-2">
+<footer class="fixed bottom-0 left-0 right-0 h-10 bg-[#004080] text-white flex items-center px-4 gap-2 z-30 text-xs">
+    <div class="flex items-center gap-1.5 shrink-0">
         <a href="{{ route('pos.index') }}" class="quick-action-btn">+ New Sale</a>
-        <a href="{{ route('repairs.create') }}" class="quick-action-btn">+ Repair</a>
-        <a href="{{ route('quotations.create') }}" class="quick-action-btn">+ Quote</a>
+        <a href="{{ route('repairs.create') }}" class="quick-action-btn hidden sm:inline-flex">+ Repair</a>
+        <a href="{{ route('quotations.create') }}" class="quick-action-btn hidden sm:inline-flex">+ Quote</a>
     </div>
-    <div class="flex-1 text-center text-white/70">
+    <div class="flex-1 text-center text-white/70 min-w-0 truncate">
         @livewire('dashboard.today-stats')
     </div>
-    <div class="text-white/60 text-[11px]">Copyright © {{ date('Y') }} OptiX. All rights reserved.Design & Developed by plexCode</div>
+    <div class="hidden md:block text-white/60 text-[11px] shrink-0">Copyright © {{ date('Y') }} OptiX. All rights reserved.</div>
 </footer>
 
 @livewireScripts
