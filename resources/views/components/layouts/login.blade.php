@@ -49,10 +49,8 @@
 {{-- Right Panel --}}
 <div class="flex-1 flex flex-col justify-center px-8 md:px-16 lg:px-24 py-12 bg-white">
     <div class="max-w-md w-full mx-auto">
-        <div class="lg:hidden mb-8">
-            <div class="text-2xl font-bold font-heading text-[#1A202C]">
-                <span>Opti</span><span class="text-[#004080]">X</span>
-            </div>
+        <div class="lg:hidden mb-8 flex justify-center">
+            <img src="{{ asset('assets/img/pageImg/56245445.png') }}" alt="OptiX" class="h-16 object-contain">
         </div>
 
         <h1 class="text-3xl font-semibold font-heading text-[#1A202C] mb-1">Welcome back</h1>
