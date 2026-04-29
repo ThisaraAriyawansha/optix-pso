@@ -71,51 +71,96 @@
 {{-- SIDEBAR --}}
 <aside :class="sidebarOpen ? 'w-56' : 'w-16'"
        class="fixed left-0 top-14 bottom-10 bg-white border-r border-[#E2E8F0] z-20 overflow-y-auto overflow-x-hidden transition-all duration-200">
+    @php
+        $perms = \App\Models\RolePermission::forRole(auth()->user()->role);
+        $isAdmin = auth()->user()->isAdmin();
+    @endphp
     <nav class="py-3 space-y-0.5">
         <div class="px-4 mb-1 mt-2">
             <p x-show="sidebarOpen" class="text-[10px] font-semibold text-[#64748B] uppercase tracking-wider">Main</p>
         </div>
         <x-sidebar-item href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')" icon="chart-bar" label="Dashboard"/>
+        @if($isAdmin || ($perms['pos'] ?? false))
         <x-sidebar-item href="{{ route('pos.index') }}" :active="request()->routeIs('pos.*')" icon="shopping-cart" label="New Sale"/>
+        @endif
+        @if($isAdmin || ($perms['quotations'] ?? false))
         <x-sidebar-item href="{{ route('quotations.index') }}" :active="request()->routeIs('quotations.*')" icon="document-text" label="Quotations"/>
+        @endif
+        @if($isAdmin || ($perms['invoices'] ?? false))
         <x-sidebar-item href="{{ route('invoices.index') }}" :active="request()->routeIs('invoices.*')" icon="receipt-tax" label="Invoices"/>
+        @endif
 
+        @if($isAdmin || ($perms['products'] ?? false) || ($perms['categories'] ?? false) || ($perms['suppliers'] ?? false) || ($perms['stock'] ?? false) || ($perms['purchase_orders'] ?? false) || ($perms['transfers'] ?? false))
         <div class="px-4 mb-1 mt-4">
             <p x-show="sidebarOpen" class="text-[10px] font-semibold text-[#64748B] uppercase tracking-wider">Inventory</p>
         </div>
+        @if($isAdmin || ($perms['products'] ?? false))
         <x-sidebar-item href="{{ route('products.index') }}" :active="request()->routeIs('products.*')" icon="cube" label="Products"/>
+        @endif
+        @if($isAdmin || ($perms['categories'] ?? false))
         <x-sidebar-item href="{{ route('categories.index') }}" :active="request()->routeIs('categories.*')" icon="tag" label="Categories"/>
+        @endif
+        @if($isAdmin || ($perms['suppliers'] ?? false))
         <x-sidebar-item href="{{ route('suppliers.index') }}" :active="request()->routeIs('suppliers.*')" icon="building-storefront" label="Suppliers"/>
+        @endif
+        @if($isAdmin || ($perms['stock'] ?? false))
         <x-sidebar-item href="{{ route('stock.index') }}" :active="request()->routeIs('stock.*')" icon="archive-box" label="Stock"/>
+        @endif
+        @if($isAdmin || ($perms['purchase_orders'] ?? false))
         <x-sidebar-item href="{{ route('purchase-orders.index') }}" :active="request()->routeIs('purchase-orders.*')" icon="truck" label="Purchase Orders"/>
+        @endif
+        @if($isAdmin || ($perms['transfers'] ?? false))
         <x-sidebar-item href="{{ route('transfers.index') }}" :active="request()->routeIs('transfers.*')" icon="arrows-right-left" label="Transfers"/>
+        @endif
+        @endif
 
+        @if($isAdmin || ($perms['customers'] ?? false) || ($perms['installments'] ?? false) || ($perms['loyalty'] ?? false) || ($perms['coupons'] ?? false))
         <div class="px-4 mb-1 mt-4">
             <p x-show="sidebarOpen" class="text-[10px] font-semibold text-[#64748B] uppercase tracking-wider">Customers</p>
         </div>
+        @if($isAdmin || ($perms['customers'] ?? false))
         <x-sidebar-item href="{{ route('customers.index') }}" :active="request()->routeIs('customers.*')" icon="users" label="Customers"/>
+        @endif
+        @if($isAdmin || ($perms['installments'] ?? false))
         <x-sidebar-item href="{{ route('installments.index') }}" :active="request()->routeIs('installments.*')" icon="credit-card" label="Installments"/>
+        @endif
+        @if($isAdmin || ($perms['loyalty'] ?? false))
         <x-sidebar-item href="{{ route('loyalty.index') }}" :active="request()->routeIs('loyalty.*')" icon="star" label="Loyalty Points"/>
+        @endif
+        @if($isAdmin || ($perms['coupons'] ?? false))
         <x-sidebar-item href="{{ route('coupons.index') }}" :active="request()->routeIs('coupons.*')" icon="ticket" label="Coupons"/>
+        @endif
+        @endif
 
+        @if($isAdmin || ($perms['repairs'] ?? false))
         <div class="px-4 mb-1 mt-4">
             <p x-show="sidebarOpen" class="text-[10px] font-semibold text-[#64748B] uppercase tracking-wider">Repairs</p>
         </div>
         <x-sidebar-item href="{{ route('repairs.index') }}" :active="request()->routeIs('repairs.*')" icon="wrench-screwdriver" label="Repair Jobs"/>
+        @endif
 
+        @if($isAdmin || ($perms['reports_sales'] ?? false) || ($perms['reports_stock'] ?? false) || ($perms['reports_expenses'] ?? false))
         <div class="px-4 mb-1 mt-4">
             <p x-show="sidebarOpen" class="text-[10px] font-semibold text-[#64748B] uppercase tracking-wider">Reports</p>
         </div>
+        @if($isAdmin || ($perms['reports_sales'] ?? false))
         <x-sidebar-item href="{{ route('reports.sales') }}" :active="request()->routeIs('reports.sales')" icon="chart-bar-square" label="Sales Report"/>
+        @endif
+        @if($isAdmin || ($perms['reports_stock'] ?? false))
         <x-sidebar-item href="{{ route('reports.stock') }}" :active="request()->routeIs('reports.stock')" icon="chart-pie" label="Stock Report"/>
+        @endif
+        @if($isAdmin || ($perms['reports_expenses'] ?? false))
         <x-sidebar-item href="{{ route('reports.expenses') }}" :active="request()->routeIs('reports.expenses')" icon="banknotes" label="Expense Report"/>
+        @endif
+        @endif
 
-        @if(auth()->user()->isAdmin())
+        @if($isAdmin)
         <div class="px-4 mb-1 mt-4">
             <p x-show="sidebarOpen" class="text-[10px] font-semibold text-[#64748B] uppercase tracking-wider">Settings</p>
         </div>
         <x-sidebar-item href="{{ route('settings.branches.index') }}" :active="request()->routeIs('settings.branches.*')" icon="building-office" label="Branches"/>
         <x-sidebar-item href="{{ route('settings.users.index') }}" :active="request()->routeIs('settings.users.*')" icon="user-group" label="Users & Roles"/>
+        <x-sidebar-item href="{{ route('settings.permissions.index') }}" :active="request()->routeIs('settings.permissions.*')" icon="shield-check" label="Role Permissions"/>
         <x-sidebar-item href="{{ route('settings.system') }}" :active="request()->routeIs('settings.system')" icon="cog-6-tooth" label="System Settings"/>
         @endif
     </nav>

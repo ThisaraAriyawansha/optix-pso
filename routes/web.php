@@ -20,6 +20,7 @@ use App\Http\Controllers\Reports\StockReportController;
 use App\Http\Controllers\Reports\TechnicianReportController;
 use App\Http\Controllers\Categories\CategoryController;
 use App\Http\Controllers\Settings\BranchController;
+use App\Http\Controllers\Settings\RolePermissionController;
 use App\Http\Controllers\Settings\SystemSettingController;
 use App\Http\Controllers\Settings\UserController;
 use App\Http\Controllers\Stock\StockController;
@@ -42,70 +43,104 @@ Route::middleware(['auth', 'set.branch'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // POS
-    Route::get('/pos', [POSController::class, 'index'])->name('pos.index');
-    Route::post('/pos/sale', [POSController::class, 'completeSale'])->name('pos.sale');
+    Route::middleware('feature:pos')->group(function () {
+        Route::get('/pos', [POSController::class, 'index'])->name('pos.index');
+        Route::post('/pos/sale', [POSController::class, 'completeSale'])->name('pos.sale');
+    });
 
     // Quotations
-    Route::resource('quotations', QuotationController::class);
-    Route::post('quotations/{quotation}/convert', [QuotationController::class, 'convertToInvoice'])->name('quotations.convert');
+    Route::middleware('feature:quotations')->group(function () {
+        Route::resource('quotations', QuotationController::class);
+        Route::post('quotations/{quotation}/convert', [QuotationController::class, 'convertToInvoice'])->name('quotations.convert');
+    });
 
     // Invoices
-    Route::resource('invoices', InvoiceController::class)->only(['index', 'show', 'destroy']);
-    Route::post('invoices/{invoice}/payment', [InvoiceController::class, 'recordPayment'])->name('invoices.payment');
-    Route::post('invoices/{invoice}/refund', [InvoiceController::class, 'refund'])->name('invoices.refund');
+    Route::middleware('feature:invoices')->group(function () {
+        Route::resource('invoices', InvoiceController::class)->only(['index', 'show', 'destroy']);
+        Route::post('invoices/{invoice}/payment', [InvoiceController::class, 'recordPayment'])->name('invoices.payment');
+        Route::post('invoices/{invoice}/refund', [InvoiceController::class, 'refund'])->name('invoices.refund');
+    });
 
     // Products & Categories
-    Route::resource('products', ProductController::class);
-    Route::resource('categories', CategoryController::class)->except(['show']);
+    Route::middleware('feature:products')->group(function () {
+        Route::resource('products', ProductController::class);
+    });
+    Route::middleware('feature:categories')->group(function () {
+        Route::resource('categories', CategoryController::class)->except(['show']);
+    });
 
     // Stock
-    Route::get('stock', [StockController::class, 'index'])->name('stock.index');
-    Route::post('stock/adjust', [StockController::class, 'adjust'])->name('stock.adjust');
-    Route::get('stock/movements', [StockMovementController::class, 'index'])->name('stock.movements');
+    Route::middleware('feature:stock')->group(function () {
+        Route::get('stock', [StockController::class, 'index'])->name('stock.index');
+        Route::post('stock/adjust', [StockController::class, 'adjust'])->name('stock.adjust');
+        Route::get('stock/movements', [StockMovementController::class, 'index'])->name('stock.movements');
+    });
 
     // Purchase Orders
-    Route::resource('purchase-orders', PurchaseOrderController::class);
-    Route::post('purchase-orders/{purchaseOrder}/receive', [PurchaseOrderController::class, 'receive'])->name('purchase-orders.receive');
+    Route::middleware('feature:purchase_orders')->group(function () {
+        Route::resource('purchase-orders', PurchaseOrderController::class);
+        Route::post('purchase-orders/{purchaseOrder}/receive', [PurchaseOrderController::class, 'receive'])->name('purchase-orders.receive');
+    });
 
     // Branch Transfers
-    Route::resource('transfers', BranchTransferController::class);
-    Route::post('transfers/{transfer}/approve', [BranchTransferController::class, 'approve'])->name('transfers.approve');
-    Route::post('transfers/{transfer}/receive', [BranchTransferController::class, 'markReceived'])->name('transfers.receive');
+    Route::middleware('feature:transfers')->group(function () {
+        Route::resource('transfers', BranchTransferController::class);
+        Route::post('transfers/{transfer}/approve', [BranchTransferController::class, 'approve'])->name('transfers.approve');
+        Route::post('transfers/{transfer}/receive', [BranchTransferController::class, 'markReceived'])->name('transfers.receive');
+    });
 
     // Customers
-    Route::resource('customers', CustomerController::class);
+    Route::middleware('feature:customers')->group(function () {
+        Route::resource('customers', CustomerController::class);
+    });
 
     // Installments
-    Route::get('installments', [InstallmentController::class, 'index'])->name('installments.index');
-    Route::get('installments/{installment}', [InstallmentController::class, 'show'])->name('installments.show');
-    Route::post('installments/{installment}/pay', [InstallmentController::class, 'recordPayment'])->name('installments.pay');
+    Route::middleware('feature:installments')->group(function () {
+        Route::get('installments', [InstallmentController::class, 'index'])->name('installments.index');
+        Route::get('installments/{installment}', [InstallmentController::class, 'show'])->name('installments.show');
+        Route::post('installments/{installment}/pay', [InstallmentController::class, 'recordPayment'])->name('installments.pay');
+    });
 
     // Loyalty
-    Route::get('loyalty', [LoyaltyController::class, 'index'])->name('loyalty.index');
-    Route::post('loyalty/{customer}/adjust', [LoyaltyController::class, 'adjust'])->name('loyalty.adjust');
+    Route::middleware('feature:loyalty')->group(function () {
+        Route::get('loyalty', [LoyaltyController::class, 'index'])->name('loyalty.index');
+        Route::post('loyalty/{customer}/adjust', [LoyaltyController::class, 'adjust'])->name('loyalty.adjust');
+    });
 
     // Coupons
-    Route::resource('coupons', CouponController::class)->except(['show']);
+    Route::middleware('feature:coupons')->group(function () {
+        Route::resource('coupons', CouponController::class)->except(['show']);
+    });
 
     // Repairs
-    Route::resource('repairs', RepairJobController::class);
-    Route::post('repairs/{repair}/status', [RepairJobStatusController::class, 'update'])->name('repairs.status');
-    Route::get('repairs/{repair}/invoice', [RepairJobController::class, 'generateInvoice'])->name('repairs.invoice');
+    Route::middleware('feature:repairs')->group(function () {
+        Route::resource('repairs', RepairJobController::class);
+        Route::post('repairs/{repair}/status', [RepairJobStatusController::class, 'update'])->name('repairs.status');
+        Route::get('repairs/{repair}/invoice', [RepairJobController::class, 'generateInvoice'])->name('repairs.invoice');
+    });
 
     // Suppliers
-    Route::resource('suppliers', SupplierController::class)->except(['show']);
+    Route::middleware('feature:suppliers')->group(function () {
+        Route::resource('suppliers', SupplierController::class)->except(['show']);
+    });
 
-    // Expenses
+    // Expenses (no feature gate — tied to reports)
     Route::resource('expenses', ExpenseController::class)->except(['show', 'edit', 'update']);
 
     // Reports
     Route::prefix('reports')->name('reports.')->group(function () {
-        Route::get('sales', [SalesReportController::class, 'index'])->name('sales');
-        Route::get('sales/export', [SalesReportController::class, 'export'])->name('sales.export');
-        Route::get('stock', [StockReportController::class, 'index'])->name('stock');
-        Route::get('stock/export', [StockReportController::class, 'export'])->name('stock.export');
+        Route::middleware('feature:reports_sales')->group(function () {
+            Route::get('sales', [SalesReportController::class, 'index'])->name('sales');
+            Route::get('sales/export', [SalesReportController::class, 'export'])->name('sales.export');
+        });
+        Route::middleware('feature:reports_stock')->group(function () {
+            Route::get('stock', [StockReportController::class, 'index'])->name('stock');
+            Route::get('stock/export', [StockReportController::class, 'export'])->name('stock.export');
+        });
         Route::get('technician', [TechnicianReportController::class, 'index'])->name('technician');
-        Route::get('expenses', [ExpenseReportController::class, 'index'])->name('expenses');
+        Route::middleware('feature:reports_expenses')->group(function () {
+            Route::get('expenses', [ExpenseReportController::class, 'index'])->name('expenses');
+        });
     });
 
     // Settings (admin only)
@@ -114,5 +149,7 @@ Route::middleware(['auth', 'set.branch'])->group(function () {
         Route::resource('users', UserController::class)->except(['show']);
         Route::get('system', [SystemSettingController::class, 'index'])->name('system');
         Route::post('system', [SystemSettingController::class, 'update'])->name('system.update');
+        Route::get('permissions', [RolePermissionController::class, 'index'])->name('permissions.index');
+        Route::post('permissions', [RolePermissionController::class, 'update'])->name('permissions.update');
     });
 });
