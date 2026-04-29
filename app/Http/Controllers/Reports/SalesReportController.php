@@ -27,11 +27,45 @@ class SalesReportController extends Controller
 
         $paymentBreakdown = $invoices->flatMap->payments->groupBy('method')->map(fn($g) => $g->sum('amount'));
 
-        $dailyData = $invoices->groupBy(fn($inv) => $inv->created_at->toDateString())
-            ->map(fn($g) => ['count' => $g->count(), 'total' => $g->sum('total')]);
+        $group = $request->group ?? 'day';
 
-        $rows = $dailyData;
-        return view('reports.sales', compact('invoices', 'totalRevenue', 'totalInvoices', 'paymentBreakdown', 'dailyData', 'rows', 'from', 'to'));
+        $rows = match ($group) {
+            'month' => $invoices->groupBy(fn($inv) => $inv->created_at->format('Y-m'))
+                ->map(fn($g, $k) => [
+                    'period'  => \Carbon\Carbon::parse($k . '-01')->format('M Y'),
+                    'count'   => $g->count(),
+                    'revenue' => $g->sum('total'),
+                    'avg'     => $g->count() > 0 ? $g->sum('total') / $g->count() : 0,
+                ])->values()->toArray(),
+            'week' => $invoices->groupBy(fn($inv) => $inv->created_at->startOfWeek()->toDateString())
+                ->map(fn($g, $k) => [
+                    'period'  => 'Week of ' . \Carbon\Carbon::parse($k)->format('d M Y'),
+                    'count'   => $g->count(),
+                    'revenue' => $g->sum('total'),
+                    'avg'     => $g->count() > 0 ? $g->sum('total') / $g->count() : 0,
+                ])->values()->toArray(),
+            default => $invoices->groupBy(fn($inv) => $inv->created_at->toDateString())
+                ->map(fn($g, $k) => [
+                    'period'  => \Carbon\Carbon::parse($k)->format('d M Y'),
+                    'count'   => $g->count(),
+                    'revenue' => $g->sum('total'),
+                    'avg'     => $g->count() > 0 ? $g->sum('total') / $g->count() : 0,
+                ])->values()->toArray(),
+        };
+
+        $refunds = Invoice::where('branch_id', $branchId)
+            ->where('status', 'refunded')
+            ->whereBetween('created_at', [$from . ' 00:00:00', $to . ' 23:59:59'])
+            ->sum('total');
+
+        $summary = [
+            'revenue' => $totalRevenue,
+            'count'   => $totalInvoices,
+            'avg'     => $totalInvoices > 0 ? $totalRevenue / $totalInvoices : 0,
+            'refunds' => $refunds,
+        ];
+
+        return view('reports.sales', compact('summary', 'paymentBreakdown', 'rows', 'from', 'to'));
     }
 
     public function export(Request $request)

@@ -15,15 +15,21 @@ class StockReportController extends Controller
 
         $categories = Category::orderBy('name')->get();
 
-        $stockItems = Stock::with(['product.category', 'variant'])
+        $stocks = Stock::with(['product.category', 'variant'])
             ->where('branch_id', $branchId)
+            ->when($request->category, fn($q) => $q->whereHas('product', fn($q2) => $q2->where('category_id', $request->category)))
+            ->when($request->filter === 'low', fn($q) => $q->whereColumn('qty_on_hand', '<=', 'min_qty')->where('qty_on_hand', '>', 0))
+            ->when($request->filter === 'out', fn($q) => $q->where('qty_on_hand', '<=', 0))
             ->get();
 
-        $totalValue = $stockItems->sum(fn($s) => $s->qty_on_hand * ($s->product->cost_price ?? 0));
-        $totalItems = $stockItems->count();
-        $lowStockCount = $stockItems->filter->isLow()->count();
+        $summary = [
+            'total_products' => $stocks->count(),
+            'low_stock'      => $stocks->filter->isLow()->count(),
+            'out_of_stock'   => $stocks->filter(fn($s) => $s->qty_on_hand <= 0)->count(),
+            'stock_value'    => $stocks->sum(fn($s) => $s->qty_on_hand * ($s->product->cost_price ?? 0)),
+        ];
 
-        return view('reports.stock', compact('stockItems', 'categories', 'totalValue', 'totalItems', 'lowStockCount'));
+        return view('reports.stock', compact('stocks', 'categories', 'summary'));
     }
 
     public function export(Request $request)

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Stock;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Stock;
 use App\Models\StockMovement;
 use App\Services\StockService;
@@ -14,16 +15,19 @@ class StockController extends Controller
     {
         $branchId = session('active_branch_id');
 
-        $stock = Stock::with(['product.category', 'variant'])
+        $categories = Category::orderBy('name')->get();
+
+        $stocks = Stock::with(['product.category', 'variant'])
             ->where('branch_id', $branchId)
             ->when($request->search, fn($q) => $q->whereHas('product', fn($q2) => $q2->where('name', 'like', "%{$request->search}%")
                 ->orWhere('sku', 'like', "%{$request->search}%")))
-            ->when($request->low, fn($q) => $q->whereColumn('qty_on_hand', '<=', 'min_qty'))
+            ->when($request->category, fn($q) => $q->whereHas('product', fn($q2) => $q2->where('category_id', $request->category)))
+            ->when($request->low_stock, fn($q) => $q->whereColumn('qty_on_hand', '<=', 'min_qty'))
             ->orderByRaw('qty_on_hand <= min_qty DESC')
             ->paginate(25)
             ->withQueryString();
 
-        return view('stock.index', compact('stock'));
+        return view('stock.index', compact('stocks', 'categories'));
     }
 
     public function adjust(Request $request, StockService $stockService)

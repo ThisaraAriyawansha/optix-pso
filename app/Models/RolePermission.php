@@ -40,7 +40,8 @@ class RolePermission extends Model
 
         return cache()->remember("role_permissions_{$role}", 60, function () use ($role) {
             $rows = static::where('role', $role)->pluck('enabled', 'feature');
-            return array_map(fn($f) => (bool) ($rows[$f] ?? false), array_flip(array_keys(static::$features)));
+            $keys = array_keys(static::$features);
+            return array_combine($keys, array_map(fn($f) => (bool) ($rows[$f] ?? false), $keys));
         });
     }
 
