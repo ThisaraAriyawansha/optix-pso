@@ -23,6 +23,8 @@ return new class extends Migration
             $table->decimal('tax_rate', 5, 2)->default(0.00);
             $table->boolean('has_variants')->default(false);
             $table->boolean('track_serial')->default(false);
+            $table->boolean('track_stock')->default(true);
+            $table->integer('reorder_point')->nullable();
             $table->string('image_url', 500)->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();

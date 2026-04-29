@@ -12,6 +12,7 @@ return new class extends Migration
         Schema::create('branches', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name', 150);
+            $table->string('code', 20)->unique()->nullable();
             $table->text('address')->nullable();
             $table->string('phone', 20)->nullable();
             $table->string('email', 100)->nullable();

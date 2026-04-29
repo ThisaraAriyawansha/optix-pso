@@ -9,7 +9,7 @@ class Category extends Model
 {
     use HasUuids;
 
-    protected $fillable = ['parent_id', 'name', 'sort_order'];
+    protected $fillable = ['parent_id', 'name', 'slug', 'description', 'sort_order'];
 
     public function parent()
     {

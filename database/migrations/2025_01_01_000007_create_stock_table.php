@@ -13,7 +13,8 @@ return new class extends Migration
             $table->uuid('branch_id');
             $table->uuid('product_id');
             $table->uuid('variant_id')->nullable();
-            $table->integer('qty')->default(0);
+            $table->integer('qty_on_hand')->default(0);
+            $table->integer('qty_reserved')->default(0);
             $table->integer('min_qty')->default(5);
             $table->unique(['branch_id', 'product_id', 'variant_id']);
             $table->foreign('branch_id')->references('id')->on('branches');
@@ -42,10 +43,10 @@ return new class extends Migration
             $table->uuid('branch_id');
             $table->uuid('product_id');
             $table->uuid('variant_id')->nullable();
-            $table->uuid('user_id');
+            $table->uuid('user_id')->nullable();
             $table->enum('type', ['purchase', 'sale', 'adjustment', 'transfer_in', 'transfer_out', 'return', 'damage'])->default('adjustment');
+            $table->integer('qty');
             $table->integer('qty_before');
-            $table->integer('qty_change');
             $table->integer('qty_after');
             $table->string('reference', 100)->nullable();
             $table->text('notes')->nullable();
@@ -53,7 +54,7 @@ return new class extends Migration
             $table->foreign('branch_id')->references('id')->on('branches');
             $table->foreign('product_id')->references('id')->on('products');
             $table->foreign('variant_id')->references('id')->on('product_variants')->nullOnDelete();
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
         });
     }
 

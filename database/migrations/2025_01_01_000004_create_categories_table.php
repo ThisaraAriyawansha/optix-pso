@@ -12,6 +12,8 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->uuid('parent_id')->nullable();
             $table->string('name', 100);
+            $table->string('slug', 120)->unique()->nullable();
+            $table->text('description')->nullable();
             $table->integer('sort_order')->default(0);
             $table->timestamps();
             $table->foreign('parent_id')->references('id')->on('categories')->nullOnDelete();

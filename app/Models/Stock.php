@@ -13,11 +13,11 @@ class Stock extends Model
 
     protected $table = 'stock';
 
-    protected $fillable = ['branch_id', 'product_id', 'variant_id', 'qty', 'min_qty'];
+    protected $fillable = ['branch_id', 'product_id', 'variant_id', 'qty_on_hand', 'qty_reserved', 'min_qty'];
 
     protected function casts(): array
     {
-        return ['qty' => 'integer', 'min_qty' => 'integer'];
+        return ['qty_on_hand' => 'integer', 'qty_reserved' => 'integer', 'min_qty' => 'integer'];
     }
 
     public function branch()
@@ -37,6 +37,6 @@ class Stock extends Model
 
     public function isLow(): bool
     {
-        return $this->qty <= $this->min_qty;
+        return $this->qty_on_hand <= $this->min_qty;
     }
 }
