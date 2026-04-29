@@ -97,7 +97,7 @@ class POSController extends Controller
                     'invoice_id' => $invoice->id,
                     'product_id' => $item['product_id'],
                     'variant_id' => $item['variant_id'] ?? null,
-                    'description' => $product->name . ($item['variant_id'] ? ' - variant' : ''),
+                    'description' => $product->name . (($item['variant_id'] ?? null) ? ' - variant' : ''),
                     'qty' => $item['qty'],
                     'unit_price' => $item['unit_price'],
                     'cost_price' => $product->cost_price,

@@ -11,7 +11,7 @@ class StockMovement extends Model
 
     protected $fillable = [
         'branch_id', 'product_id', 'variant_id', 'user_id', 'type',
-        'qty_before', 'qty_change', 'qty_after', 'reference', 'notes',
+        'qty_before', 'qty', 'qty_after', 'reference', 'notes',
     ];
 
     public function branch()
