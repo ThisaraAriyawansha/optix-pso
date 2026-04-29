@@ -30,7 +30,8 @@ class SalesReportController extends Controller
         $dailyData = $invoices->groupBy(fn($inv) => $inv->created_at->toDateString())
             ->map(fn($g) => ['count' => $g->count(), 'total' => $g->sum('total')]);
 
-        return view('reports.sales', compact('invoices', 'totalRevenue', 'totalInvoices', 'paymentBreakdown', 'dailyData', 'from', 'to'));
+        $rows = $dailyData;
+        return view('reports.sales', compact('invoices', 'totalRevenue', 'totalInvoices', 'paymentBreakdown', 'dailyData', 'rows', 'from', 'to'));
     }
 
     public function export(Request $request)

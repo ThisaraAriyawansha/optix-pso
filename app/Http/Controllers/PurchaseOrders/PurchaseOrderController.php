@@ -17,11 +17,11 @@ class PurchaseOrderController extends Controller
 {
     public function index()
     {
-        $pos = PurchaseOrder::with(['supplier', 'creator'])
+        $orders = PurchaseOrder::with(['supplier', 'creator'])
             ->where('branch_id', session('active_branch_id'))
             ->latest()
             ->paginate(20);
-        return view('purchase-orders.index', compact('pos'));
+        return view('purchase-orders.index', compact('orders'));
     }
 
     public function create()

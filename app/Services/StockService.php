@@ -19,11 +19,11 @@ class StockService
     ): Stock {
         $stock = Stock::firstOrCreate(
             ['branch_id' => $branchId, 'product_id' => $productId, 'variant_id' => $variantId],
-            ['qty' => 0, 'min_qty' => 5]
+            ['qty_on_hand' => 0, 'min_qty' => 5]
         );
 
-        $qtyBefore = $stock->qty;
-        $stock->qty += $qtyChange;
+        $qtyBefore = $stock->qty_on_hand;
+        $stock->qty_on_hand += $qtyChange;
         $stock->save();
 
         StockMovement::create([
@@ -32,9 +32,9 @@ class StockService
             'variant_id' => $variantId,
             'user_id' => Auth::id(),
             'type' => $type,
+            'qty' => $qtyChange,
             'qty_before' => $qtyBefore,
-            'qty_change' => $qtyChange,
-            'qty_after' => $stock->qty,
+            'qty_after' => $stock->qty_on_hand,
             'reference' => $reference,
             'notes' => $notes,
         ]);
@@ -47,14 +47,14 @@ class StockService
         return Stock::where('branch_id', $branchId)
             ->where('product_id', $productId)
             ->when($variantId, fn($q) => $q->where('variant_id', $variantId))
-            ->value('qty') ?? 0;
+            ->value('qty_on_hand') ?? 0;
     }
 
     public function getLowStockItems(string $branchId): \Illuminate\Database\Eloquent\Collection
     {
         return Stock::with(['product', 'variant'])
             ->where('branch_id', $branchId)
-            ->whereColumn('qty', '<=', 'min_qty')
+            ->whereColumn('qty_on_hand', '<=', 'min_qty')
             ->get();
     }
 }

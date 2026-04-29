@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Reports;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Stock;
 use Illuminate\Http\Request;
 
@@ -12,15 +13,17 @@ class StockReportController extends Controller
     {
         $branchId = session('active_branch_id');
 
+        $categories = Category::orderBy('name')->get();
+
         $stockItems = Stock::with(['product.category', 'variant'])
             ->where('branch_id', $branchId)
             ->get();
 
-        $totalValue = $stockItems->sum(fn($s) => $s->qty * ($s->product->cost_price ?? 0));
+        $totalValue = $stockItems->sum(fn($s) => $s->qty_on_hand * ($s->product->cost_price ?? 0));
         $totalItems = $stockItems->count();
         $lowStockCount = $stockItems->filter->isLow()->count();
 
-        return view('reports.stock', compact('stockItems', 'totalValue', 'totalItems', 'lowStockCount'));
+        return view('reports.stock', compact('stockItems', 'categories', 'totalValue', 'totalItems', 'lowStockCount'));
     }
 
     public function export(Request $request)
@@ -36,10 +39,10 @@ class StockReportController extends Controller
                 fputcsv($file, [
                     $item->product->name,
                     $item->product->sku ?? '',
-                    $item->qty,
+                    $item->qty_on_hand,
                     $item->min_qty,
                     $item->isLow() ? 'Low' : 'OK',
-                    number_format($item->qty * $item->product->cost_price, 2),
+                    number_format($item->qty_on_hand * ($item->product->cost_price ?? 0), 2),
                 ]);
             }
             fclose($file);

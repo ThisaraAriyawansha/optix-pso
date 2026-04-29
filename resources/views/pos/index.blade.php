@@ -124,14 +124,18 @@
 
     @push('scripts')
     <script>
-    const allProducts = @json($products->map(fn($p) => [
-        'id' => $p->id,
-        'name' => $p->name,
-        'selling_price' => $p->selling_price,
-        'category_id' => $p->category_id,
-        'barcode' => $p->barcode,
-        'stock' => $p->stock->where('branch_id', session('active_branch_id'))->sum('qty'),
-    ]));
+    @php
+        $branchId = session('active_branch_id');
+        $productsData = $products->map(fn($p) => [
+            'id' => $p->id,
+            'name' => $p->name,
+            'selling_price' => $p->selling_price,
+            'category_id' => $p->category_id,
+            'barcode' => $p->barcode,
+            'stock' => $p->stock->where('branch_id', $branchId)->sum('qty_on_hand'),
+        ]);
+    @endphp
+    const allProducts = @json($productsData);
 
     function pos() {
         return {

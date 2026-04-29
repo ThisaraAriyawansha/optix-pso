@@ -18,8 +18,8 @@ class StockController extends Controller
             ->where('branch_id', $branchId)
             ->when($request->search, fn($q) => $q->whereHas('product', fn($q2) => $q2->where('name', 'like', "%{$request->search}%")
                 ->orWhere('sku', 'like', "%{$request->search}%")))
-            ->when($request->low, fn($q) => $q->whereColumn('qty', '<=', 'min_qty'))
-            ->orderByRaw('qty <= min_qty DESC')
+            ->when($request->low, fn($q) => $q->whereColumn('qty_on_hand', '<=', 'min_qty'))
+            ->orderByRaw('qty_on_hand <= min_qty DESC')
             ->paginate(25)
             ->withQueryString();
 
