@@ -85,6 +85,7 @@
         </div>
         <x-sidebar-item href="{{ route('products.index') }}" :active="request()->routeIs('products.*')" icon="cube" label="Products"/>
         <x-sidebar-item href="{{ route('categories.index') }}" :active="request()->routeIs('categories.*')" icon="tag" label="Categories"/>
+        <x-sidebar-item href="{{ route('suppliers.index') }}" :active="request()->routeIs('suppliers.*')" icon="building-storefront" label="Suppliers"/>
         <x-sidebar-item href="{{ route('stock.index') }}" :active="request()->routeIs('stock.*')" icon="archive-box" label="Stock"/>
         <x-sidebar-item href="{{ route('purchase-orders.index') }}" :active="request()->routeIs('purchase-orders.*')" icon="truck" label="Purchase Orders"/>
         <x-sidebar-item href="{{ route('transfers.index') }}" :active="request()->routeIs('transfers.*')" icon="arrows-right-left" label="Transfers"/>
@@ -145,7 +146,7 @@
     <div class="flex-1 text-center text-white/70">
         @livewire('dashboard.today-stats')
     </div>
-    <div class="text-white/60 text-[11px]">© 2025 OptiX v1.0.0</div>
+    <div class="text-white/60 text-[11px]">Copyright © {{ date('Y') }} OptiX. All rights reserved.Design & Developed by plexCode</div>
 </footer>
 
 @livewireScripts
