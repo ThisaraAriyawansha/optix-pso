@@ -73,6 +73,7 @@ class QuotationController extends Controller
                 'branch_id' => session('active_branch_id'),
                 'created_by' => Auth::id(),
                 'quote_number' => $numbers->nextQuotationNumber(),
+                'issue_date' => now(),
                 'status' => 'draft',
                 'valid_until' => $data['valid_until'] ?? null,
                 'customer_name' => $data['customer_name'] ?? null,

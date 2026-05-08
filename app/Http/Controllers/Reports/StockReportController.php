@@ -15,19 +15,22 @@ class StockReportController extends Controller
 
         $categories = Category::orderBy('name')->get();
 
-        $stocks = Stock::with(['product.category', 'variant'])
+        $query = Stock::with(['product.category', 'variant'])
             ->where('branch_id', $branchId)
             ->when($request->category, fn($q) => $q->whereHas('product', fn($q2) => $q2->where('category_id', $request->category)))
             ->when($request->filter === 'low', fn($q) => $q->whereColumn('qty_on_hand', '<=', 'min_qty')->where('qty_on_hand', '>', 0))
-            ->when($request->filter === 'out', fn($q) => $q->where('qty_on_hand', '<=', 0))
-            ->get();
+            ->when($request->filter === 'out', fn($q) => $q->where('qty_on_hand', '<=', 0));
+
+        $all = $query->get();
 
         $summary = [
-            'total_products' => $stocks->count(),
-            'low_stock'      => $stocks->filter->isLow()->count(),
-            'out_of_stock'   => $stocks->filter(fn($s) => $s->qty_on_hand <= 0)->count(),
-            'stock_value'    => $stocks->sum(fn($s) => $s->qty_on_hand * ($s->product->cost_price ?? 0)),
+            'total_products' => $all->count(),
+            'low_stock'      => $all->filter->isLow()->count(),
+            'out_of_stock'   => $all->filter(fn($s) => $s->qty_on_hand <= 0)->count(),
+            'stock_value'    => $all->sum(fn($s) => $s->qty_on_hand * ($s->product->cost_price ?? 0)),
         ];
+
+        $stocks = $query->paginate(50)->withQueryString();
 
         return view('reports.stock', compact('stocks', 'categories', 'summary'));
     }

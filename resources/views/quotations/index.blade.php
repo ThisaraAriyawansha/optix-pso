@@ -37,7 +37,7 @@
                 <tr class="table-row-alt border-b border-[#F1F5F9] hover:bg-[#F5F7FA]">
                     <td class="px-5 py-3"><a href="{{ route('quotations.show', $q) }}" class="text-[#004080] font-medium font-mono text-xs hover:underline">{{ $q->quote_number }}</a></td>
                     <td class="px-5 py-3 text-[#64748B]">{{ $q->customer?->name ?? $q->customer_name }}</td>
-                    <td class="px-5 py-3 text-[#64748B]">{{ $q->issue_date->format('d M Y') }}</td>
+                    <td class="px-5 py-3 text-[#64748B]">{{ $q->issue_date?->format('d M Y') ?? $q->created_at->format('d M Y') }}</td>
                     <td class="px-5 py-3 text-[#64748B]">{{ $q->expiry_date?->format('d M Y') ?? '—' }}</td>
                     <td class="px-5 py-3 text-right font-semibold">Rs. {{ number_format($q->total, 2) }}</td>
                     <td class="px-5 py-3 text-center"><x-badge :status="$q->status" :label="ucfirst($q->status)"/></td>

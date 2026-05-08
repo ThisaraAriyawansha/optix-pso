@@ -1,6 +1,15 @@
 <x-layouts.app title="New Quotation">
     <x-page-header title="New Quotation" :breadcrumbs="[['label' => 'Quotations', 'url' => route('quotations.index')], ['label' => 'New', 'url' => '#']]"/>
-    <div class="p-6" x-data="quotationForm()">
+    <div class="p-6" x-data="{
+        items: [{ description: '', qty: 1, unit_price: 0, line_total: 0 }],
+        discount: 0,
+        addItem() { this.items.push({ description: '', qty: 1, unit_price: 0, line_total: 0 }); },
+        removeItem(i) { this.items.splice(i, 1); },
+        calcItem(i) { this.items[i].line_total = (this.items[i].qty * this.items[i].unit_price).toFixed(2); },
+        subtotal() { return this.items.reduce((s, i) => s + parseFloat(i.line_total || 0), 0); },
+        total() { return Math.max(0, this.subtotal() - parseFloat(this.discount || 0)); },
+        submitForm(e) { e.target.submit(); }
+    }">
         <form method="POST" action="{{ route('quotations.store') }}" class="max-w-4xl" @submit.prevent="submitForm">
             @csrf
             <div class="space-y-5">
@@ -92,31 +101,3 @@
     </div>
 </x-layouts.app>
 
-@push('scripts')
-<script>
-function quotationForm() {
-    return {
-        items: [{ description: '', qty: 1, unit_price: 0, line_total: 0 }],
-        discount: 0,
-        addItem() {
-            this.items.push({ description: '', qty: 1, unit_price: 0, line_total: 0 });
-        },
-        removeItem(i) {
-            this.items.splice(i, 1);
-        },
-        calcItem(i) {
-            this.items[i].line_total = (this.items[i].qty * this.items[i].unit_price).toFixed(2);
-        },
-        subtotal() {
-            return this.items.reduce((s, i) => s + parseFloat(i.line_total || 0), 0);
-        },
-        total() {
-            return Math.max(0, this.subtotal() - parseFloat(this.discount || 0));
-        },
-        submitForm(e) {
-            e.target.submit();
-        }
-    }
-}
-</script>
-@endpush

@@ -174,6 +174,7 @@
     <div class="text-white/60 text-[11px]">© 2025 OptiX v1.0.0</div>
 </footer>
 
+@stack('scripts')
 @livewireScripts
 </body>
 </html>

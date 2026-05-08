@@ -16,7 +16,7 @@
             <div class="flex items-start justify-between mb-6">
                 <div>
                     <h2 class="text-xl font-bold font-heading text-[#1A202C] font-mono">{{ $quotation->quote_number }}</h2>
-                    <p class="text-sm text-[#64748B] mt-1">Issued: {{ $quotation->issue_date->format('d M Y') }}</p>
+                    <p class="text-sm text-[#64748B] mt-1">Issued: {{ $quotation->issue_date?->format('d M Y') ?? $quotation->created_at->format('d M Y') }}</p>
                     @if($quotation->expiry_date)
                     <p class="text-sm text-[#64748B]">Expires: {{ $quotation->expiry_date->format('d M Y') }}</p>
                     @endif
